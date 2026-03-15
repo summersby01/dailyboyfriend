@@ -47,14 +47,21 @@ export function GameShell() {
     }
   }
 
+  function getRandomStartIndex() {
+    return Math.floor(Math.random() * idols.length);
+  }
+
   function handleStart() {
     if (idols.length === 0) {
       return;
     }
 
+    const startIndex = getRandomStartIndex();
+
     stopRollingTimer();
     setFeedback(null);
     setSelectedIdolId(null);
+    setCurrentIndex(startIndex);
     setPhase("rolling");
 
     intervalRef.current = window.setInterval(() => {
@@ -64,7 +71,7 @@ export function GameShell() {
 
   function handleStop() {
     stopRollingTimer();
-    const chosen = idols[currentIndex];
+    const chosen = idols[currentIndex % idols.length];
     setSelectedIdolId(chosen.id);
     setPhase("result");
     setFeedback(null);
