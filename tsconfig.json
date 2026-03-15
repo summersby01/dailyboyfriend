@@ -19,6 +19,7 @@
       }
     ],
     "paths": {
+      "@/lib/idols": ["./lib/idols.ts"],
       "@/*": ["./src/*"]
     }
   },
