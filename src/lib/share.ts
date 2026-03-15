@@ -1,35 +1,24 @@
-declare global {
-  interface Window {
-    Kakao?: {
-      init: (key: string) => void;
-      isInitialized: () => boolean;
-      Share: {
-        sendDefault: (options: Record<string, unknown>) => void;
-      };
-    };
-  }
-}
-
 type BaseSharePayload = {
   title: string;
   text: string;
   url: string;
-  imageUrl?: string;
 };
-
-type KakaoShareResult = "shared" | "missing_key" | "sdk_unavailable";
-
-function getKakaoKey() {
-  return process.env.NEXT_PUBLIC_KAKAO_JS_KEY;
-}
 
 function buildTwitterShareUrl(payload: BaseSharePayload) {
   const params = new URLSearchParams({
-    text: `${payload.text}`,
+    text: payload.text,
     url: payload.url,
   });
 
   return `https://twitter.com/intent/tweet?${params.toString()}`;
+}
+
+function buildFacebookShareUrl(payload: BaseSharePayload) {
+  const params = new URLSearchParams({
+    u: payload.url,
+  });
+
+  return `https://www.facebook.com/sharer/sharer.php?${params.toString()}`;
 }
 
 function isMobileBrowser() {
@@ -52,20 +41,22 @@ export function openTwitterShare(payload: BaseSharePayload): "opened" | "redirec
   return "opened";
 }
 
-export async function shareWithSystem(payload: BaseSharePayload): Promise<"shared" | "copied"> {
-  if (navigator.share) {
-    await navigator.share(payload);
-    return "shared";
+export function openFacebookShare(payload: BaseSharePayload): "opened" | "redirected" {
+  const shareUrl = buildFacebookShareUrl(payload);
+
+  if (isMobileBrowser()) {
+    window.location.href = shareUrl;
+    return "redirected";
   }
 
-  await copyShareLink(payload);
-  return "copied";
+  window.open(shareUrl, "_blank", "noopener,noreferrer,width=626,height=436");
+  return "opened";
 }
 
-export async function copyShareLink(payload: BaseSharePayload): Promise<void> {
+export async function copyShareLink(payload: BaseSharePayload): Promise<"clipboard" | "fallback"> {
   if (navigator.clipboard?.writeText) {
     await navigator.clipboard.writeText(payload.url);
-    return;
+    return "clipboard";
   }
 
   const textArea = document.createElement("textarea");
@@ -75,48 +66,12 @@ export async function copyShareLink(payload: BaseSharePayload): Promise<void> {
   document.body.appendChild(textArea);
   textArea.focus();
   textArea.select();
-  document.execCommand("copy");
+  const copied = document.execCommand("copy");
   document.body.removeChild(textArea);
-}
 
-export async function shareViaKakao(payload: BaseSharePayload): Promise<KakaoShareResult> {
-  const kakaoKey = getKakaoKey();
-
-  if (!kakaoKey) {
-    return "missing_key";
+  if (!copied) {
+    throw new Error("copy_failed");
   }
 
-  const kakao = window.Kakao;
-
-  if (!kakao) {
-    return "sdk_unavailable";
-  }
-
-  if (!kakao.isInitialized()) {
-    kakao.init(kakaoKey);
-  }
-
-  kakao.Share.sendDefault({
-    objectType: "feed",
-    content: {
-      title: payload.title,
-      description: payload.text,
-      imageUrl: payload.imageUrl ?? `${payload.url}/youngk.jpg`,
-      link: {
-        mobileWebUrl: payload.url,
-        webUrl: payload.url,
-      },
-    },
-    buttons: [
-      {
-        title: "결과 보기",
-        link: {
-          mobileWebUrl: payload.url,
-          webUrl: payload.url,
-        },
-      },
-    ],
-  });
-
-  return "shared";
+  return "fallback";
 }

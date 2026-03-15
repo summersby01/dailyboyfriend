@@ -12,7 +12,7 @@ export function ResultCard({ idol }: ResultCardProps) {
         <div className="relative aspect-[3/4] overflow-hidden rounded-[20px] bg-white">
           <Image
             src={idol.image}
-            alt={`${idol.name} 결과 이미지`}
+            alt={`${idol.name} result image`}
             fill
             className="object-cover object-center"
             sizes="(max-width: 768px) 88vw, 400px"
@@ -29,10 +29,10 @@ export function ResultCard({ idol }: ResultCardProps) {
       </div>
       <div className="mt-5 rounded-[24px] bg-cream px-5 py-6 text-center">
         <div className="text-sm font-semibold uppercase tracking-[0.24em] text-berry/80">
-          오늘의 남자친구
+          Boyfriend of the Day
         </div>
         <div className="mt-3 text-[1.65rem] font-black tracking-[-0.04em] text-ink">
-          {idol.name} 입니다 💘
+          It&apos;s {idol.name} 💘
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@ import { ResultScreen } from "@/components/game/ResultScreen";
 import { RollingScreen } from "@/components/game/RollingScreen";
 import { idols } from "@/lib/idols";
 import { saveElementAsPng } from "@/lib/save-image";
-import { openTwitterShare, shareViaKakao, shareWithSystem } from "@/lib/share";
+import { copyShareLink, openFacebookShare, openTwitterShare } from "@/lib/share";
 import type { GamePhase } from "@/types/idol";
 
 const ROLL_INTERVAL_MS = 110;
@@ -80,9 +80,9 @@ export function GameShell() {
 
     try {
       await saveElementAsPng(resultCardRef.current, `daily-boyfriend-${selectedIdol.id}.png`);
-      setFeedback("결과 카드가 PNG로 저장됐어요.");
+      setFeedback("Your result card was saved as a PNG.");
     } catch {
-      setFeedback("이미지 저장에 실패했습니다. 다시 시도해주세요.");
+      setFeedback("Failed to save the image. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -93,16 +93,13 @@ export function GameShell() {
       return null;
     }
 
-    const currentOrigin =
-      typeof window !== "undefined" ? window.location.origin : process.env.NEXT_PUBLIC_SITE_URL || "";
     const currentUrl =
       typeof window !== "undefined" ? window.location.href : process.env.NEXT_PUBLIC_SITE_URL || "";
 
     return {
-      title: "일간남친 💘",
-      text: "오늘의 남자친구 테스트 결과",
+      title: "Daily Boyfriend 💘",
+      text: "My daily boyfriend result 💘",
       url: currentUrl,
-      imageUrl: `${currentOrigin}${selectedIdol.image}`,
     };
   }
 
@@ -119,18 +116,16 @@ export function GameShell() {
       }
 
       const result = openTwitterShare(sharePayload);
-      setFeedback(result === "redirected" ? "트위터 공유 화면으로 이동해요." : "트위터 공유 창을 열었어요.");
+      setFeedback(result === "redirected" ? "Redirecting to X share." : "Opened the X share window.");
     } catch {
-      setFeedback("공유에 실패했습니다. 다시 시도해주세요.");
+      setFeedback("Sharing failed. Please try again.");
     }
   }
 
-  async function handleKakaoShare() {
+  function handleFacebookShare() {
     if (!selectedIdol) {
       return;
     }
-
-    setFeedback(null);
 
     try {
       const sharePayload = getSharePayload();
@@ -139,23 +134,10 @@ export function GameShell() {
         return;
       }
 
-      const result = await shareViaKakao(sharePayload);
-
-      if (result === "missing_key") {
-        setFeedback("카카오 공유를 사용하려면 NEXT_PUBLIC_KAKAO_JS_KEY를 설정해야 합니다.");
-        return;
-      }
-
-      if (result === "sdk_unavailable") {
-        setFeedback("카카오 SDK가 아직 준비되지 않았습니다. 잠시 후 다시 시도해주세요.");
-        return;
-      }
-
-      setFeedback("카카오톡 공유 창을 열었어요.");
+      const result = openFacebookShare(sharePayload);
+      setFeedback(result === "redirected" ? "Redirecting to Facebook share." : "Opened the Facebook share window.");
     } catch {
-      setFeedback(
-        "카카오톡 공유에 실패했습니다. 현재 접속 주소가 카카오 개발자 콘솔의 웹 도메인에 등록되어 있는지와 JavaScript 키 사용 여부를 확인해주세요.",
-      );
+      setFeedback("Sharing failed. Please try again.");
     }
   }
 
@@ -173,10 +155,10 @@ export function GameShell() {
         return;
       }
 
-      const result = await shareWithSystem(sharePayload);
-      setFeedback(result === "shared" ? "공유 창을 열었어요." : "공유가 지원되지 않아 링크를 복사했어요.");
+      await copyShareLink(sharePayload);
+      setFeedback("Link copied!");
     } catch {
-      setFeedback("공유에 실패했습니다. 다시 시도해주세요.");
+      setFeedback("Failed to copy the link. Please try again.");
     }
   }
 
@@ -193,14 +175,14 @@ export function GameShell() {
       <main className="flex min-h-screen items-center justify-center px-4 py-10">
         <div className="w-full max-w-[430px]">
           <ErrorNotice
-            message="표시할 아이돌 데이터가 없습니다."
+            message="No idol data is available to display."
             action={
               <Button
-                aria-label="다시 시도"
+                aria-label="Try again"
                 fullWidth={false}
                 onClick={() => window.location.reload()}
               >
-                다시 시도
+                Try Again
               </Button>
             }
           />
@@ -230,8 +212,8 @@ export function GameShell() {
             isShareBusy={false}
             onRestart={handleRestart}
             onSave={handleSave}
+            onFacebookShare={handleFacebookShare}
             onTwitterShare={handleTwitterShare}
-            onKakaoShare={handleKakaoShare}
             onCopyLink={handleCopyLink}
           />
         ) : null}

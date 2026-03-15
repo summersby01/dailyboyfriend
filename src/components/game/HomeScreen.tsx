@@ -12,15 +12,15 @@ export function HomeScreen({ disabled = false, onStart }: HomeScreenProps) {
         Daily Meme Game
       </div>
       <h1 className="mt-5 font-display text-[2.5rem] font-black tracking-[-0.04em] text-ink">
-        일간남친
+        Daily Boyfriend
       </h1>
       <p className="mt-6 text-lg font-semibold leading-8 text-ink">
-        START를 눌러
+        Press START
         <br />
-        오늘의 남자친구를 만나보세요
+        to meet your boyfriend of the day
       </p>
       <div className="mt-8 w-full">
-        <Button aria-label="게임 시작" disabled={disabled} onClick={onStart}>
+        <Button aria-label="Start game" disabled={disabled} onClick={onStart}>
           START
         </Button>
       </div>

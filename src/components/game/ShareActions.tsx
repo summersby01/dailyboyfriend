@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 type ShareActionItem = {
-  key: "twitter" | "kakao" | "copy";
+  key: "twitter" | "facebook" | "copy";
   label: string;
   ariaLabel: string;
   onClick: () => void;
@@ -10,7 +10,7 @@ type ShareActionItem = {
 type ShareActionsProps = {
   isBusy: boolean;
   onTwitterShare: () => void;
-  onKakaoShare: () => void;
+  onFacebookShare: () => void;
   onCopyLink: () => void;
 };
 
@@ -22,10 +22,10 @@ function TwitterIcon() {
   );
 }
 
-function KakaoIcon() {
+function FacebookIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-6 w-6 fill-current">
-      <path d="M12 3C6.477 3 2 6.582 2 11c0 2.797 1.802 5.254 4.527 6.683L5.5 21l4.033-2.29c.791.122 1.614.19 2.467.19 5.523 0 10-3.582 10-8s-4.477-7.9-10-7.9Z" />
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="h-7 w-7 fill-current">
+      <path d="M13.5 21v-7h2.3l.4-3h-2.7V9.2c0-.9.2-1.5 1.5-1.5H16V5.1c-.2 0-.9-.1-1.8-.1-1.8 0-3 1.1-3 3.3V11H9v3h2.4v7h2.1Z" />
     </svg>
   );
 }
@@ -41,26 +41,26 @@ function ShareIcon() {
 
 const actionStyles: Record<ShareActionItem["key"], string> = {
   twitter: "bg-[#221722] text-white shadow-glow",
-  kakao: "bg-[#FEE500] text-[#3A1D1D] shadow-[0_16px_32px_rgba(254,229,0,0.28)]",
+  facebook: "bg-[#1877F2] text-white shadow-[0_16px_32px_rgba(24,119,242,0.28)]",
   copy: "bg-white text-berry ring-1 ring-rose/80 shadow-card",
 };
 
 const iconMap: Record<ShareActionItem["key"], ReactNode> = {
   twitter: <TwitterIcon />,
-  kakao: <KakaoIcon />,
+  facebook: <FacebookIcon />,
   copy: <ShareIcon />,
 };
 
 export function ShareActions({
   isBusy,
   onTwitterShare,
-  onKakaoShare,
+  onFacebookShare,
   onCopyLink,
 }: ShareActionsProps) {
   const items: ShareActionItem[] = [
-    { key: "twitter", label: "트위터", ariaLabel: "트위터로 공유", onClick: onTwitterShare },
-    { key: "kakao", label: "카카오톡", ariaLabel: "카카오톡으로 공유", onClick: onKakaoShare },
-    { key: "copy", label: "공유하기", ariaLabel: "공유하기", onClick: onCopyLink },
+    { key: "twitter", label: "Twitter", ariaLabel: "Share on Twitter", onClick: onTwitterShare },
+    { key: "facebook", label: "Facebook", ariaLabel: "Share on Facebook", onClick: onFacebookShare },
+    { key: "copy", label: "Copy Link", ariaLabel: "Copy link", onClick: onCopyLink },
   ];
 
   return (

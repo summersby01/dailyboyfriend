@@ -15,7 +15,7 @@ export function RollingScreen({ currentIdol, onStop }: RollingScreenProps) {
           <Image
             priority
             src={currentIdol.image}
-            alt={`${currentIdol.name} 이미지`}
+            alt={`${currentIdol.name} photo`}
             fill
             className="object-cover object-center"
             sizes="(max-width: 768px) 90vw, 420px"
@@ -24,14 +24,14 @@ export function RollingScreen({ currentIdol, onStop }: RollingScreenProps) {
         </div>
       </div>
       <div className="mt-6 w-full">
-        <Button aria-label="현재 아이돌로 결과 확정" onClick={onStop}>
+        <Button aria-label="Stop on the current idol" onClick={onStop}>
           STOP
         </Button>
       </div>
       <p className="mt-5 text-base font-semibold leading-7 text-ink">
-        STOP을 눌러
+        Press STOP
         <br />
-        오늘의 남자친구를 결정하세요
+        to lock in your boyfriend of the day
       </p>
     </section>
   );

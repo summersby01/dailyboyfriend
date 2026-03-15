@@ -21,7 +21,7 @@ type ResultScreenProps = {
   isSaving: boolean;
   onSave: () => void;
   onTwitterShare: () => void;
-  onKakaoShare: () => void;
+  onFacebookShare: () => void;
   onCopyLink: () => void;
   isShareBusy: boolean;
   onRestart: () => void;
@@ -35,7 +35,7 @@ export const ResultScreen = forwardRef<HTMLDivElement, ResultScreenProps>(
       isSaving,
       onSave,
       onTwitterShare,
-      onKakaoShare,
+      onFacebookShare,
       onCopyLink,
       isShareBusy,
       onRestart,
@@ -63,24 +63,24 @@ export const ResultScreen = forwardRef<HTMLDivElement, ResultScreenProps>(
         </div>
         <div className="relative mb-5 text-center">
           <h2 className="font-display text-[2rem] font-black tracking-[-0.04em] text-ink">
-            오늘의 남자친구
+            Boyfriend of the Day
           </h2>
         </div>
         <div ref={ref} className="relative">
           <ResultCard idol={idol} />
         </div>
         <div className="relative mt-5 flex flex-col gap-3">
-          <Button aria-label="결과 카드 저장" disabled={isSaving} onClick={onSave}>
-            {isSaving ? "저장 중..." : "사진 저장"}
+          <Button aria-label="Save result card" disabled={isSaving} onClick={onSave}>
+            {isSaving ? "Saving..." : "Save Photo"}
           </Button>
           <ShareActions
             isBusy={isShareBusy}
             onCopyLink={onCopyLink}
-            onKakaoShare={onKakaoShare}
+            onFacebookShare={onFacebookShare}
             onTwitterShare={onTwitterShare}
           />
-          <Button aria-label="다시 시작" onClick={onRestart} tone="ghost">
-            다시하기
+          <Button aria-label="Play again" onClick={onRestart} tone="ghost">
+            Play Again
           </Button>
         </div>
         {feedback ? (
