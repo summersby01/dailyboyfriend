@@ -10,10 +10,23 @@ import { idols } from "@/lib/idols";
 import { saveElementAsPng } from "@/lib/save-image";
 import { copyShareLink, openFacebookShare, openTwitterShare } from "@/lib/share";
 import type { GamePhase } from "@/types/idol";
+import { en, type Language } from "../../../lib/i18n/en";
+import { es } from "../../../lib/i18n/es";
+import { ja } from "../../../lib/i18n/ja";
+import { ko } from "../../../lib/i18n/ko";
+import {
+  detectBrowserLanguage,
+  languageOptions,
+  parseStoredLanguage,
+} from "../../../lib/i18n/utils";
 
 const ROLL_INTERVAL_MS = 110;
+const LANGUAGE_STORAGE_KEY = "dailyboyfriend-language";
 
 export function GameShell() {
+  const [lang, setLang] = useState<Language>("en");
+  const [hasInitializedLanguage, setHasInitializedLanguage] = useState(false);
+  const t = lang === "ko" ? ko : lang === "es" ? es : lang === "ja" ? ja : en;
   const [phase, setPhase] = useState<GamePhase>("home");
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedIdolId, setSelectedIdolId] = useState<string | null>(null);
@@ -39,6 +52,21 @@ export function GameShell() {
       stopRollingTimer();
     };
   }, []);
+
+  useEffect(() => {
+    const storedLanguage = parseStoredLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY));
+    const initialLanguage = storedLanguage ?? detectBrowserLanguage();
+    setLang(initialLanguage);
+    setHasInitializedLanguage(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasInitializedLanguage) {
+      return;
+    }
+
+    window.localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+  }, [hasInitializedLanguage, lang]);
 
   function stopRollingTimer() {
     if (intervalRef.current !== null) {
@@ -87,9 +115,9 @@ export function GameShell() {
 
     try {
       await saveElementAsPng(resultCardRef.current, `daily-boyfriend-${selectedIdol.id}.png`);
-      setFeedback("Your result card was saved as a PNG.");
+      setFeedback(t.saveSuccess);
     } catch {
-      setFeedback("Failed to save the image. Please try again.");
+      setFeedback(t.saveError);
     } finally {
       setIsSaving(false);
     }
@@ -104,8 +132,8 @@ export function GameShell() {
       typeof window !== "undefined" ? window.location.href : process.env.NEXT_PUBLIC_SITE_URL || "";
 
     return {
-      title: "Daily Boyfriend 💘",
-      text: "My daily boyfriend result 💘",
+      title: t.shareTitle,
+      text: t.shareText,
       url: currentUrl,
     };
   }
@@ -123,9 +151,9 @@ export function GameShell() {
       }
 
       const result = openTwitterShare(sharePayload);
-      setFeedback(result === "redirected" ? "Redirecting to X share." : "Opened the X share window.");
+      setFeedback(result === "redirected" ? t.twitterRedirected : t.twitterOpened);
     } catch {
-      setFeedback("Sharing failed. Please try again.");
+      setFeedback(t.shareError);
     }
   }
 
@@ -142,9 +170,9 @@ export function GameShell() {
       }
 
       const result = openFacebookShare(sharePayload);
-      setFeedback(result === "redirected" ? "Redirecting to Facebook share." : "Opened the Facebook share window.");
+      setFeedback(result === "redirected" ? t.facebookRedirected : t.facebookOpened);
     } catch {
-      setFeedback("Sharing failed. Please try again.");
+      setFeedback(t.shareError);
     }
   }
 
@@ -163,9 +191,9 @@ export function GameShell() {
       }
 
       await copyShareLink(sharePayload);
-      setFeedback("Link copied!");
+      setFeedback(t.copySuccess);
     } catch {
-      setFeedback("Failed to copy the link. Please try again.");
+      setFeedback(t.copyError);
     }
   }
 
@@ -182,14 +210,14 @@ export function GameShell() {
       <main className="flex min-h-screen items-center justify-center px-4 py-10">
         <div className="w-full max-w-[430px]">
           <ErrorNotice
-            message="No idol data is available to display."
+            message={t.noData}
             action={
               <Button
-                aria-label="Try again"
+                aria-label={t.retryAria}
                 fullWidth={false}
                 onClick={() => window.location.reload()}
               >
-                Try Again
+                {t.retry}
               </Button>
             }
           />
@@ -206,9 +234,26 @@ export function GameShell() {
   return (
     <main className="flex min-h-screen items-center justify-center px-4 py-8">
       <div className="w-full max-w-[430px]">
-        {phase === "home" ? <HomeScreen disabled={idols.length === 0} onStart={handleStart} /> : null}
+        <div className="mb-4 flex justify-end">
+          <label className="flex min-w-[168px] flex-col gap-1 text-sm font-semibold text-berry">
+            <span>{t.language}</span>
+            <select
+              aria-label={t.languageMenuAria}
+              className="min-h-11 rounded-2xl border border-rose/70 bg-white/90 px-4 py-2 text-sm font-semibold text-ink shadow-card outline-none transition focus:border-blush"
+              value={lang}
+              onChange={(event) => setLang(event.target.value as Language)}
+            >
+              {languageOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+        </div>
+        {phase === "home" ? <HomeScreen disabled={idols.length === 0} onStart={handleStart} t={t} /> : null}
         {phase === "rolling" && currentIdol ? (
-          <RollingScreen currentIdol={currentIdol} onStop={handleStop} />
+          <RollingScreen currentIdol={currentIdol} onStop={handleStop} t={t} />
         ) : null}
         {phase === "result" && selectedIdol ? (
           <ResultScreen
@@ -222,6 +267,7 @@ export function GameShell() {
             onFacebookShare={handleFacebookShare}
             onTwitterShare={handleTwitterShare}
             onCopyLink={handleCopyLink}
+            t={t}
           />
         ) : null}
       </div>

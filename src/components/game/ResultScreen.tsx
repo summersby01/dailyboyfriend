@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { ResultCard } from "@/components/game/ResultCard";
 import { ShareActions } from "@/components/game/ShareActions";
 import type { Idol } from "@/types/idol";
+import type { I18nMessages } from "../../../lib/i18n/en";
 
 const floatingHearts = [
   { left: "8%", top: "12%", size: "text-xl", delay: "0s", duration: "6.4s" },
@@ -25,6 +26,7 @@ type ResultScreenProps = {
   onCopyLink: () => void;
   isShareBusy: boolean;
   onRestart: () => void;
+  t: I18nMessages;
 };
 
 export const ResultScreen = forwardRef<HTMLDivElement, ResultScreenProps>(
@@ -39,6 +41,7 @@ export const ResultScreen = forwardRef<HTMLDivElement, ResultScreenProps>(
       onCopyLink,
       isShareBusy,
       onRestart,
+      t,
     },
     ref,
   ) {
@@ -63,24 +66,25 @@ export const ResultScreen = forwardRef<HTMLDivElement, ResultScreenProps>(
         </div>
         <div className="relative mb-5 text-center">
           <h2 className="font-display text-[2rem] font-black tracking-[-0.04em] text-ink">
-            Boyfriend of the Day
+            {t.resultTitle}
           </h2>
         </div>
         <div ref={ref} className="relative">
-          <ResultCard idol={idol} />
+          <ResultCard idol={idol} t={t} />
         </div>
         <div className="relative mt-5 flex flex-col gap-3">
-          <Button aria-label="Save result card" disabled={isSaving} onClick={onSave}>
-            {isSaving ? "Saving..." : "Save Photo"}
+          <Button aria-label={t.saveAria} disabled={isSaving} onClick={onSave}>
+            {isSaving ? t.saving : t.save}
           </Button>
           <ShareActions
             isBusy={isShareBusy}
             onCopyLink={onCopyLink}
             onFacebookShare={onFacebookShare}
             onTwitterShare={onTwitterShare}
+            t={t}
           />
-          <Button aria-label="Play again" onClick={onRestart} tone="ghost">
-            Play Again
+          <Button aria-label={t.playAgainAria} onClick={onRestart} tone="ghost">
+            {t.playAgain}
           </Button>
         </div>
         {feedback ? (

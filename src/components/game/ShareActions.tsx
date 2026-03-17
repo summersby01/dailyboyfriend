@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { I18nMessages } from "../../../lib/i18n/en";
 
 type ShareActionItem = {
   key: "twitter" | "facebook" | "copy";
@@ -12,6 +13,7 @@ type ShareActionsProps = {
   onTwitterShare: () => void;
   onFacebookShare: () => void;
   onCopyLink: () => void;
+  t: I18nMessages;
 };
 
 function TwitterIcon() {
@@ -56,11 +58,12 @@ export function ShareActions({
   onTwitterShare,
   onFacebookShare,
   onCopyLink,
+  t,
 }: ShareActionsProps) {
   const items: ShareActionItem[] = [
-    { key: "twitter", label: "Twitter", ariaLabel: "Share on Twitter", onClick: onTwitterShare },
-    { key: "facebook", label: "Facebook", ariaLabel: "Share on Facebook", onClick: onFacebookShare },
-    { key: "copy", label: "Copy Link", ariaLabel: "Copy link", onClick: onCopyLink },
+    { key: "twitter", label: t.shareTwitter, ariaLabel: t.shareOnTwitterAria, onClick: onTwitterShare },
+    { key: "facebook", label: t.shareFacebook, ariaLabel: t.shareOnFacebookAria, onClick: onFacebookShare },
+    { key: "copy", label: t.copyLink, ariaLabel: t.copyLinkAria, onClick: onCopyLink },
   ];
 
   return (
